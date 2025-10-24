@@ -75,7 +75,7 @@ app.post('/add-pokemon', (req, res) => {
 
 // Route to set the user name
 app.post('/set-name', (req, res) => {
-  const { name } = req.body;
+  const { name } = req.body || {}; // Fallback to an empty object if req.body is undefined
   userName = name || 'Guest';
   res.redirect('/');
 });
