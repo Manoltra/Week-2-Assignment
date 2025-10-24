@@ -19,12 +19,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Home page route
+// Update the home page route to include a script for dynamically updating the trainer name
 app.get('/', (req, res) => {
   res.send(`
     <h1>Welcome to the Home Page</h1>
-    <form action="/set-name" method="POST">
-      <input type="text" name="name" placeholder="Enter your name" value="${userName}" required />
+    <div id="user-name">Welcome, ${res.locals.userName}!</div>
+    <form id="set-name-form" action="/set-name" method="POST">
+      <input type="text" name="name" placeholder="Enter your name" value="${res.locals.userName}" required />
       <button type="submit">Set Name</button>
     </form>
     <button onclick="fetch('/random-name').then(res => res.text()).then(alert)">Get Random Name</button>
@@ -32,6 +33,20 @@ app.get('/', (req, res) => {
       <a href="/about">About</a> |
       <a href="/contact">Contact</a>
     </nav>
+    <script>
+      document.getElementById('set-name-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const response = await fetch('/set-name', {
+          method: 'POST',
+          body: formData
+        });
+        if (response.redirected) {
+          const newName = formData.get('name');
+          document.getElementById('user-name').textContent = 'Welcome ${newName}!';
+        }
+      });
+    </script>
   `);
 });
 
@@ -73,11 +88,11 @@ app.post('/add-pokemon', (req, res) => {
   res.send(`${pokemonName} has been added to the Pokemon list!`);
 });
 
-// Route to set the user name
+// Update the route to set the user name to avoid redirecting
 app.post('/set-name', (req, res) => {
   const { name } = req.body || {}; // Fallback to an empty object if req.body is undefined
   userName = name || 'Guest';
-  res.redirect('/');
+  res.status(200).end(); // Send a success response without redirecting
 });
 
 // Route to get a random name
