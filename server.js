@@ -10,6 +10,9 @@ let userName = 'Guest';
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// Add middleware to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+
 // Middleware to include the user name in all pages
 app.use((req, res, next) => {
   res.locals.userName = userName;
@@ -25,6 +28,10 @@ app.get('/', (req, res) => {
       <button type="submit">Set Name</button>
     </form>
     <button onclick="fetch('/random-name').then(res => res.text()).then(alert)">Get Random Name</button>
+    <nav>
+      <a href="/about">About</a> |
+      <a href="/contact">Contact</a>
+    </nav>
   `);
 });
 
